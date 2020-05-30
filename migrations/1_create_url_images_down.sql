@@ -1,0 +1,1 @@
+drop table img_Url_Color
