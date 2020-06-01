@@ -1,9 +1,10 @@
 package parser
 
 import (
-	//image ...
 	"c/GoExam/imagesUrlColor/model"
 	"image"
+
+	"golang.org/x/image/draw"
 
 	"log"
 	"net/http"
@@ -11,28 +12,26 @@ import (
 	"strings"
 
 	"github.com/cenkalti/dominantcolor"
-	"golang.org/x/image/draw"
 	"golang.org/x/net/html"
+
+	_ "image/jpeg" //image ...
 )
 
-//Result ...
-type Result struct {
-	resultURLColor []*model.URLImage
-}
-
 //GetImagesLinks ...
-func GetImagesLinks(count int) ([]Result, error) {
-	links := generate(2)
+func GetImagesLinks() []model.URLImage {
+	links := imgURLParser(2, 100)
 
-	var resultURLColor []st.URLImage
-	var result st.URLImage
+	var resURLColor []model.URLImage
+	var result model.URLImage
 	for _, url := range links {
 		result.URLImg = url
-		result.Color = findFromUrl(url)
-		resultURLColor = append(resultURLColor, result)
+		img := findFromURL(url)
+		result.Color = imgColorProcessor(img)
+		resURLColor = append(resURLColor, result)
 	}
-	log.Print(resultURLColor)
-	return resultURLColor, nil
+	log.Print(resURLColor)
+
+	return resURLColor
 }
 
 //imgURLParser ...
@@ -52,7 +51,8 @@ func imgURLParser(workers int, count int) []string {
 	return allURL
 }
 
-func findFromURL(pageURL string) (img Image) {
+//findFromURL ...
+func findFromURL(pageURL string) image.Image {
 	resp, err := http.Get(pageURL)
 	if err != nil {
 		log.Print(err)
@@ -60,18 +60,17 @@ func findFromURL(pageURL string) (img Image) {
 
 	defer resp.Body.Close()
 
-	img, _, errr := image.Decode(resp.Body)
+	img, _, err := image.Decode(resp.Body)
 	if err != nil {
-		log.Print(errr)
+		log.Print(err)
 	}
 
 	return img
 }
 
-func ImgColorProcessor(img Image) string {
-	// создаём пустое изображение для записи необходимого размера
+func imgColorProcessor(img image.Image) string {
 	dst := image.NewRGBA(image.Rect(0, 0, 200, 200))
-	// изменение размера
+
 	draw.CatmullRom.Scale(dst, dst.Bounds(), img, img.Bounds(), draw.Over, nil)
 
 	return dominantcolor.Hex(dominantcolor.Find(dst))
