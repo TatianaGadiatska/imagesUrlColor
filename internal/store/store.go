@@ -52,5 +52,3 @@ func (r *URLImageRepository) InsertURL(urlColorImages []model.URLImage) {
 	}
 	log.Print("Insert OK")
 }
-
-

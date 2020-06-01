@@ -2,4 +2,4 @@ bind_addr = ":8080"
 log_level = "debug"
 
 [store]
-database_url = "user=postgres password=123 dbname=images_db sslmode=disable"
+database_url = "user=postgres password=123 dbname=mydb sslmode=disable dbname=images_db sslmode=disable"
